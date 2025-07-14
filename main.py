@@ -1,8 +1,27 @@
 import json
+from typing import List
 from fastapi import FastAPI
+from pydantic import BaseModel
 from starlette.responses import Response
 
 app = FastAPI()
+
+
+class EventModel(BaseModel):
+    name: str
+    description: str
+    start_date: str
+    end_date: str
+
+
+events_store: List[EventModel] = []
+
+
+def serialized_stored_events():
+    events_converted = []
+    for event in events_store:
+        events_converted.append(event.model_dump())
+    return events_converted
 
 
 @app.get("/")
@@ -10,6 +29,11 @@ def root():
     with open("welcome.html", "r", encoding="utf-8") as file:
         html_content = file.read()
     return Response(content=html_content, status_code=200, media_type="text/html")
+
+
+@app.get("/events")
+def list_events():
+    return {"events": serialized_stored_events()}
 
 
 @app.get("/{full_path:path}")
