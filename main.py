@@ -42,6 +42,23 @@ def new_events(event_payload: List[EventModel]):
     return {"events": serialized_stored_events()}
 
 
+@app.put("/events")
+def update_or_create_events(event_payload: List[EventModel]):
+    global events_store  # `global` to indicate here that we want to use global variable not creating local events_store var
+
+    for new_event in event_payload:
+        # Used to check if event already exists later
+        found = False
+        for i, existing_event in enumerate(events_store):
+            if new_event.name == existing_event.name:
+                events_store[i] = new_event
+                found = True
+                break
+        if not found:
+            events_store.append(new_event)
+    return {"events": serialized_stored_events()}
+
+
 @app.get("/{full_path:path}")
 def catch_all(full_path: str):
     not_found_message = {"detail": f"Page '/{full_path}' not found"}
