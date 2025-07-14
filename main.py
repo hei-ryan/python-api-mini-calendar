@@ -61,5 +61,6 @@ def update_or_create_events(event_payload: List[EventModel]):
 
 @app.get("/{full_path:path}")
 def catch_all(full_path: str):
-    not_found_message = {"detail": f"Page '/{full_path}' not found"}
-    return Response(content=json.dumps(not_found_message), status_code=404, media_type="application/json")
+    with open("not_found.html", "r", encoding="utf-8") as file:
+        html_content = file.read()
+    return Response(content=html_content, status_code=200, media_type="text/html")
