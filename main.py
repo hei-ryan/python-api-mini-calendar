@@ -36,6 +36,12 @@ def list_events():
     return {"events": serialized_stored_events()}
 
 
+@app.post("/events")
+def new_events(event_payload: List[EventModel]):
+    events_store.extend(event_payload)
+    return {"events": serialized_stored_events()}
+
+
 @app.get("/{full_path:path}")
 def catch_all(full_path: str):
     not_found_message = {"detail": f"Page '/{full_path}' not found"}
