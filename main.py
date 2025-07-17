@@ -28,8 +28,11 @@ def serialized_stored_events():
 @app.get("/")
 def root(request: Request):
     accept_headers = request.headers.get("Accept")
+    authorization = request.headers.get("x-api-key")
     if accept_headers != "text/html" and accept_headers != "text/plain":
         return JSONResponse(content={"message": f"Media Type not supported : {accept_headers}"}, status_code=400)
+    if authorization != "12345678":
+        return JSONResponse(content={"message": f"Provided key unknown : {authorization}"}, status_code=403)
     with open("welcome.html", "r", encoding="utf-8") as file:
         html_content = file.read()
     return Response(content=html_content, status_code=200, media_type="text/html")
