@@ -2,7 +2,8 @@ import json
 from typing import List
 from fastapi import FastAPI
 from pydantic import BaseModel
-from starlette.responses import Response
+from starlette.requests import Request
+from starlette.responses import Response, JSONResponse
 
 app = FastAPI()
 
@@ -25,7 +26,10 @@ def serialized_stored_events():
 
 
 @app.get("/")
-def root():
+def root(request: Request):
+    accept_headers = request.headers.get("Accept")
+    if accept_headers != "text/html" and accept_headers != "text/plain":
+        return JSONResponse(content={"message": f"Media Type not supported : {accept_headers}"}, status_code=400)
     with open("welcome.html", "r", encoding="utf-8") as file:
         html_content = file.read()
     return Response(content=html_content, status_code=200, media_type="text/html")
